@@ -130,7 +130,7 @@ def perform_summarization(text, percentage=0.3):
 def main():
     st.set_page_config(page_title="Ringkasan Edukasi Python AI", layout="centered")
     st.title("📚 Ringkasan Materi Edukasi Otomatis")
-    st.markdown("Aplikasi web untuk merangkum file PDF/Teks menggunakan Algoritma Ekstraktif (Python NLP).")
+    st.markdown("Aplikasi web untuk merangkum file Teks menggunakan Algoritma Ekstraktif (Python NLP).")
 
     # --- Sidebar Kontrol ---
     st.sidebar.header("⚙️ Pengaturan Ringkasan")
@@ -143,22 +143,20 @@ def main():
     st.sidebar.info("Persentase 25% adalah rasio yang baik untuk ringkasan cepat.")
     
     # --- Input Utama ---
-    tab1, tab2 = st.tabs(["Unggah File (PDF/TXT)", "Input Teks Langsung"])
+    tab1, tab2 = st.tabs(["Unggah File (TXT)", "Input Teks Langsung"])
 
     raw_text = None
     file_name = "Teks_Manual"
     uploaded_file = None
     
     with tab1:
-        uploaded_file = st.file_uploader("Unggah File Materi", type=["pdf", "txt"])
+        uploaded_file = st.file_uploader("Unggah File Materi", type=["txt"])
         
         if uploaded_file is not None:
             file_name = uploaded_file.name
             
             # Membaca file
-            if file_name.lower().endswith('.pdf'):
-                raw_text = extract_text_from_pdf(uploaded_file)
-            elif file_name.lower().endswith('.txt'):
+            if file_name.lower().endswith('.txt'):
                 raw_text = uploaded_file.read().decode('utf-8')
     
     with tab2:
@@ -196,7 +194,7 @@ def main():
             )
 
         elif "Error" in summary:
-             st.error(summary)
+            st.error(summary)
         
     elif uploaded_file is None and not st.session_state.get('manual_text_active', False):
         st.info("Silakan unggah file atau tempel teks pada tab di atas untuk memulai.")
