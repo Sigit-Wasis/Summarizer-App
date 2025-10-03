@@ -8,22 +8,30 @@ import os
 import io
 from datetime import datetime
 
-# --- Memastikan Data NLTK Diunduh/Tersedia ---
-# Menggunakan st.cache_resource untuk memastikan data NLTK hanya diunduh sekali.
-# Logika ini menggantikan blok try-except/nltk.download di awal skrip.
+# --- Memastikan Data NLTK Diunduh/Tersedia (Solusi Streamlit Cloud) ---
+
 @st.cache_resource
-def download_nltk_data():
+def download_nltk_punkt():
+    """Mengunduh resource 'punkt' yang dibutuhkan oleh sent_tokenize."""
     try:
-        # Download data yang sangat dibutuhkan NLTK
         nltk.download('punkt', quiet=True)
+    except Exception as e:
+        st.error(f"Gagal mengunduh NLTK Punkt: {e}")
+
+@st.cache_resource
+def get_stopwords():
+    """Mengunduh stopwords dan mengembalikan set Bahasa Indonesia."""
+    try:
         nltk.download('stopwords', quiet=True)
         # Mengembalikan stopwords Bahasa Indonesia
         return set(stopwords.words('indonesian'))
     except LookupError:
-        # Fallback jika gagal total (jarang terjadi setelah cache)
+        # Fallback jika gagal total
         return set()
 
-STOPWORDS_ID = download_nltk_data()
+# Panggil fungsi unduhan di awal
+download_nltk_punkt()
+STOPWORDS_ID = get_stopwords()
 
 # -------------------------------------------------------------------
 
@@ -72,6 +80,7 @@ def perform_summarization(text, percentage=0.3):
         return None
     
     cleaned_text = re.sub(r'\s+', ' ', text).strip()
+    # Peringatan: Jika LookupError masih terjadi, ini adalah barisnya.
     sentences = sent_tokenize(cleaned_text)
     words = word_tokenize(cleaned_text.lower())
     
