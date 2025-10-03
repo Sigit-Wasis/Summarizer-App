@@ -7,26 +7,29 @@ import re
 import os
 import io
 from datetime import datetime
-# from fpdf import FPDF # Tidak diperlukan lagi
 
-# --- KONFIGURASI NLTK & STOPWORDS ---
-try:
-    STOPWORDS_ID = set(stopwords.words('indonesian'))
-except LookupError:
-    # Unduh jika belum ada.
-    nltk.download('stopwords', quiet=True)
-    nltk.download('punkt', quiet=True)
-    STOPWORDS_ID = set(stopwords.words('indonesian'))
+# --- Memastikan Data NLTK Diunduh/Tersedia ---
+# Menggunakan st.cache_resource untuk memastikan data NLTK hanya diunduh sekali.
+# Logika ini menggantikan blok try-except/nltk.download di awal skrip.
+@st.cache_resource
+def download_nltk_data():
+    try:
+        # Download data yang sangat dibutuhkan NLTK
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        # Mengembalikan stopwords Bahasa Indonesia
+        return set(stopwords.words('indonesian'))
+    except LookupError:
+        # Fallback jika gagal total (jarang terjadi setelah cache)
+        return set()
+
+STOPWORDS_ID = download_nltk_data()
 
 # -------------------------------------------------------------------
 
 # =================================================================
 # FUNGSI UTILITAS 
 # =================================================================
-
-# FUNGSI save_summary_to_pdf TELAH DIHILANGKAN
-# def save_summary_to_pdf(...)
-# ...
 
 def save_summary_to_txt(summary, original_file_name, percentage):
     """
@@ -170,11 +173,6 @@ def main():
             st.markdown("---")
             st.subheader("📥 Unduh Hasil")
             
-            # 1. Unduh PDF (TELAH DIHILANGKAN)
-            # pdf_bytes = save_summary_to_pdf(summary, file_name, percentage)
-            # pdf_output_name = f"{os.path.splitext(file_name)[0]}_RINGKASAN_{int(percentage*100)}persen.pdf"
-            # st.download_button(...)
-
             # 2. Unduh TXT
             txt_bytes = save_summary_to_txt(summary, file_name, percentage)
             txt_output_name = f"{os.path.splitext(file_name)[0]}_RINGKASAN_{int(percentage*100)}persen.txt"
@@ -192,13 +190,4 @@ def main():
          st.info("Silakan unggah file atau tempel teks pada tab di atas untuk memulai.")
 
 if __name__ == '__main__':
-    # Memastikan resource NLTK diunduh di awal jika belum ada
-    try:
-        if not nltk.find('tokenizers/punkt'):
-            nltk.download('punkt', quiet=True)
-        if not nltk.find('corpora/stopwords'):
-             nltk.download('stopwords', quiet=True)
-    except LookupError:
-        pass # Ditangani di blok atas
-        
     main()
