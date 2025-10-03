@@ -12,9 +12,12 @@ from datetime import datetime
 
 @st.cache_resource
 def download_nltk_punkt():
-    """Mengunduh resource 'punkt' yang dibutuhkan oleh sent_tokenize."""
+    """Mengunduh resource 'punkt' yang dibutuhkan oleh sent_tokenize, termasuk varian 'tab'."""
     try:
+        # Mengunduh paket dasar 'punkt'
         nltk.download('punkt', quiet=True)
+        # Mengunduh paket spesifik 'punkt_tab' yang sering menyebabkan LookupError
+        nltk.download('punkt_tab', quiet=True) 
     except Exception as e:
         st.error(f"Gagal mengunduh NLTK Punkt: {e}")
 
@@ -196,7 +199,7 @@ def main():
              st.error(summary)
         
     elif uploaded_file is None and not st.session_state.get('manual_text_active', False):
-         st.info("Silakan unggah file atau tempel teks pada tab di atas untuk memulai.")
+        st.info("Silakan unggah file atau tempel teks pada tab di atas untuk memulai.")
 
 if __name__ == '__main__':
     main()
